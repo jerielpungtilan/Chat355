@@ -1,11 +1,9 @@
 /* styles.css */
 
-/* Global Styles */
 body {
     font-family: Arial, sans-serif;
 }
 
-/* Chat Container */
 .chat-container {
     background-color: #f7fafc;
     width: 96%;

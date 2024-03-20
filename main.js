@@ -1,10 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 
-// Add Firebase products that you want to use
 import {
     getAuth,
     signInAnonymously,
-} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import {
     getFirestore,
     addDoc,
@@ -14,9 +13,8 @@ import {
     getDocs,
     query,
     where,
-} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
     apiKey: "AIzaSyBuj50BXXv0lLiaF7vcQO993H6spoWrS7U",
     authDomain: "chat-30d66.firebaseapp.com",
@@ -92,18 +90,11 @@ function subscribeToNewMessages() {
             });
         });
 
-        /**
-         * Creating hash map of the existing messages.
-         */
         let existingMessageHash = {};
         for (let message of messages) {
             existingMessageHash[message.id] = true;
         }
 
-        /**
-         * Push only those messages which do not
-         * exist in the hashMap
-         */
         for (let message of newMessages) {
             if (!existingMessageHash[message.id]) {
                 messages.push(message);
@@ -136,7 +127,7 @@ function writeMessagesArray() {
 }
 
 function messageTemplate(message, username, timestamp) {
-    const currentUser = specifiedUsername; // Assuming you have stored the current user's username in specifiedUsername
+    const currentUser = specifiedUsername;
 
     // Check if the message is sent by the current user
     const isCurrentUser = username === currentUser;
