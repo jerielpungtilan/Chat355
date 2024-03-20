@@ -1,0 +1,8 @@
+{
+  "name": "Chat355",
+  "version": "1.0.0",
+  "dependencies": {
+    "firebase": "^10.9.0"
+  },
+  "type": "module"
+}
