@@ -1,19 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-
-import {
-    getAuth,
-    signInAnonymously,
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import {
-    getFirestore,
-    addDoc,
-    collection,
-    onSnapshot,
-    doc,
-    getDocs,
-    query,
-    where,
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getFirestore, addDoc, collection, onSnapshot, getDocs, query } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBuj50BXXv0lLiaF7vcQO993H6spoWrS7U",
@@ -24,13 +11,9 @@ const firebaseConfig = {
     appId: "1:349271227605:web:9e890398de9eb8a52df65c",
     measurementId: "G-GP7T1C5YMZ"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-const auth = getAuth(app);
+const firebaseApp = initializeApp(firebaseConfig);
+const firebaseFirestore = getFirestore(firebaseApp);
+const firebaseAuth = getAuth(firebaseApp);
 
 const joinButton = document.getElementById("joinButton");
 const usernameInput = document.getElementById("usernameInput");
@@ -38,50 +21,54 @@ const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
 const joinView = document.getElementById("joinView");
 const chatsView = document.getElementById("chatsView");
-let messages = [];
+let messageList = [];
 
-let specifiedUsername = "";
-let userLoggedIn = false;
+let enteredUsername = "";
+let isLoggedIn = false;
+
 joinButton.addEventListener("click", () => {
-    specifiedUsername = usernameInput.value;
-    if (!specifiedUsername) {
-        alert("username cannot be empty");
+    enteredUsername = usernameInput.value.trim();
+    if (!enteredUsername) {
+        alert("Please enter a username.");
         return;
     }
 
-    signInAnonymously(auth)
+    signInAnonymously(firebaseAuth)
         .then(async () => {
             joinView.classList.add("hidden");
             chatsView.classList.remove("hidden");
-            userLoggedIn = true;
-            await loadHistoricalMessages();
+            isLoggedIn = true;
+            await loadOldMessages();
             await subscribeToNewMessages();
-            writeMessagesArray();
-            console.log("User logged-in");
+            renderMessages();
+            console.log("User has successfully logged in.");
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-
-            console.log(errorCode, errorMessage);
+            console.error("An error occurred during sign-in:", error);
         });
 });
 
 sendButton.addEventListener("click", async () => {
-    const message = messageInput.value;
+    const enteredMessage = messageInput.value.trim();
+    if (!enteredMessage) return;
+
     messageInput.value = "";
 
-    const docRef = await addDoc(collection(db, "messages"), {
-        user: specifiedUsername,
-        message: message,
-        created: new Date(),
-    });
-    console.log(docRef);
+    try {
+        const docRef = await addDoc(collection(firebaseFirestore, "messages"), {
+            user: enteredUsername,
+            message: enteredMessage,
+            created: new Date(),
+        });
+        console.log("Message sent successfully:", docRef.id);
+    } catch (error) {
+        console.error("Error sending message:", error);
+    }
 });
 
 function subscribeToNewMessages() {
-    const q = query(collection(db, "messages"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const messageQuery = query(collection(firebaseFirestore, "messages"));
+    const unsubscribe = onSnapshot(messageQuery, (querySnapshot) => {
         const newMessages = [];
         querySnapshot.forEach((doc) => {
             newMessages.push({
@@ -90,58 +77,51 @@ function subscribeToNewMessages() {
             });
         });
 
-        let existingMessageHash = {};
-        for (let message of messages) {
-            existingMessageHash[message.id] = true;
-        }
+        const existingMessageIds = new Set(messageList.map(msg => msg.id));
 
-        for (let message of newMessages) {
-            if (!existingMessageHash[message.id]) {
-                messages.push(message);
+        newMessages.forEach((message) => {
+            if (!existingMessageIds.has(message.id)) {
+                messageList.push(message);
             }
-        }
-
-        writeMessagesArray();
-    });
-}
-
-async function loadHistoricalMessages() {
-    messages = [];
-    const querySnapshot = await getDocs(collection(db, "messages"));
-    querySnapshot.forEach((doc) => {
-        messages.push({
-            id: doc.id,
-            ...doc.data(),
         });
+
+        renderMessages();
     });
-    console.log(messages);
-    return messages;
 }
 
-function writeMessagesArray() {
-    const html = [];
-    for (let message of messages) {
-        html.push(messageTemplate(message.message, message.user, message.created));
+async function loadOldMessages() {
+    messageList = [];
+    try {
+        const messageSnapshot = await getDocs(collection(firebaseFirestore, "messages"));
+        messageSnapshot.forEach((doc) => {
+            messageList.push({
+                id: doc.id,
+                ...doc.data(),
+            });
+        });
+        console.log("Historical messages loaded successfully.");
+    } catch (error) {
+        console.error("Error loading historical messages:", error);
     }
-    document.getElementById("messageList").innerHTML = html.join("");
 }
 
-function messageTemplate(message, username, timestamp) {
-    const currentUser = specifiedUsername;
+function renderMessages() {
+    const messageListElement = document.getElementById("messageList");
+    messageListElement.innerHTML = messageList.map(message => getMessageHTML(message)).join("");
+}
 
-    // Check if the message is sent by the current user
-    const isCurrentUser = username === currentUser;
-
-    // Apply different CSS classes based on whether the message is from the current user or not
-    const bubbleClass = isCurrentUser ? 'message-bubble-me' : 'message-bubble-other';
+function getMessageHTML(message) {
+    const isCurrentUser = message.user === enteredUsername;
+    const bubbleClass = isCurrentUser ? "message-bubble-me" : "message-bubble-other";
+    const timestamp = new Date(message.created.seconds * 1000).toLocaleString();
 
     return `<li class="message">
         <div class="${bubbleClass}">
             <div class="message-header">
-                <div class="sender">${username}</div>
-                <div class="timestamp">${new Date(timestamp.seconds * 1000).toLocaleString()}</div>
+                <div class="sender">${message.user}</div>
+                <div class="timestamp">${timestamp}</div>
             </div>
-            <div class="message-content">${message}</div>
+            <div class="message-content">${message.message}</div>
         </div>
     </li>`;
 }
