@@ -31,7 +31,6 @@ const chatsView = document.getElementById("chatsView");
 
 // Initialize variables for managing user state and message data
 let messageList = [];
-let enteredUsername = "";
 let isLoggedIn = false;
 
 // Event listener for sign-up button click
