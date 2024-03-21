@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { getFirestore, addDoc, collection, onSnapshot, getDocs, query } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBuj50BXXv0lLiaF7vcQO993H6spoWrS7U",
@@ -15,7 +15,8 @@ const firebaseApp = initializeApp(firebaseConfig);
 const firebaseFirestore = getFirestore(firebaseApp);
 const firebaseAuth = getAuth(firebaseApp);
 
-const joinButton = document.getElementById("joinButton");
+const loginButton = document.getElementById("loginButton");
+const signUpButton = document.getElementById("signUpButton");
 const usernameInput = document.getElementById("usernameInput");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
@@ -26,27 +27,80 @@ let messageList = [];
 let enteredUsername = "";
 let isLoggedIn = false;
 
-joinButton.addEventListener("click", () => {
-    enteredUsername = usernameInput.value.trim();
-    if (!enteredUsername) {
-        alert("Please enter a username.");
+// Add event listener for sign-up
+signUpButton.addEventListener("click", async () => {
+    const enteredEmail = emailInput.value.trim();
+    const enteredPassword = passwordInput.value.trim();
+
+    if (!enteredEmail || !enteredPassword) {
+        alert("Please enter both email and password.");
         return;
     }
 
-    signInAnonymously(firebaseAuth)
-        .then(async () => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(firebaseAuth, enteredEmail, enteredPassword);
+        const user = userCredential.user;
+        console.log("User signed up successfully:", user.uid);
+        // Hide join view and display chat view upon successful sign-up
+        joinView.classList.add("hidden");
+        chatsView.classList.remove("hidden");
+        isLoggedIn = true;
+        await loadOldMessages();
+        await getNewMessages();
+        renderMessages();
+        console.log("User has successfully signed up and logged in.");
+    } catch (error) {
+        console.error("An error occurred during sign-up:", error.message);
+        // Handle error (e.g., show error message to the user)
+    }
+});
+
+// Add event listener for login
+loginButton.addEventListener("click", async () => {
+    const enteredEmail = emailInput.value.trim();
+    const enteredPassword = passwordInput.value.trim();
+
+    if (!enteredEmail || !enteredPassword) {
+        alert("Please enter both email and password.");
+        return;
+    }
+
+    signInWithEmailAndPassword(firebaseAuth, enteredEmail, enteredPassword)
+        .then(async(userCredential) => {
+            const user = userCredential.user;
+            console.log("User logged in successfully:", user.uid);
+            // Hide join view and display chat view upon successful login
             joinView.classList.add("hidden");
             chatsView.classList.remove("hidden");
             isLoggedIn = true;
             await loadOldMessages();
-            await subscribeToNewMessages();
+            await getNewMessages();
             renderMessages();
             console.log("User has successfully logged in.");
         })
         .catch((error) => {
-            console.error("An error occurred during sign-in:", error);
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error("An error occurred during login:", errorMessage);
+            // Handle error (e.g., show error message to the user)
         });
 });
+
+
+
+// Add listener for authentication state changes
+firebaseAuth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is signed in
+        isLoggedIn = true;
+        // Update UI for authenticated user
+    } else {
+        // User is signed out
+        isLoggedIn = false;
+        // Update UI for signed out user
+    }
+});
+
 
 sendButton.addEventListener("click", async () => {
     const enteredMessage = messageInput.value.trim();
@@ -66,7 +120,7 @@ sendButton.addEventListener("click", async () => {
     }
 });
 
-function subscribeToNewMessages() {
+function getNewMessages() {
     const messageQuery = query(collection(firebaseFirestore, "messages"));
     const unsubscribe = onSnapshot(messageQuery, (querySnapshot) => {
         const newMessages = [];
