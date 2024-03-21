@@ -79,27 +79,26 @@ loginButton.addEventListener("click", async () => {
     }
 
     // Sign in with provided email and password
-    signInWithEmailAndPassword(firebaseAuth, enteredEmail, enteredPassword)
-        .then(async (userCredential) => {
-            const user = userCredential.user;
+    try {
+        const userCredential = await signInWithEmailAndPassword(firebaseAuth, enteredEmail, enteredPassword);
+        const user = userCredential.user;
 
-            // Handle successful login by updating UI and loading messages
-            console.log("User logged in successfully:", user.uid);
-            joinView.classList.add("hidden");
-            chatsView.classList.remove("hidden");
-            isLoggedIn = true;
-            await loadOldMessages();
-            await getNewMessages(user.email);
-            renderMessages(user.email); // Pass the current user's email
-            console.log("User has successfully logged in.");
-        })
-        .catch((error) => {
-            // Handle login error
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.error("An error occurred during login:", errorMessage);
-        });
+        // Handle successful login by updating UI and loading messages
+        console.log("User logged in successfully:", user.uid);
+        joinView.classList.add("hidden");
+        chatsView.classList.remove("hidden");
+        isLoggedIn = true;
+        await loadOldMessages();
+        await getNewMessages(user.email);
+        renderMessages(user.email); // Pass the current user's email
+        console.log("User has successfully logged in.");
+    } catch (error) {
+        // Handle login error
+        const errorMessage = error.message;
+        console.error("An error occurred during login:", errorMessage);
+    }
 });
+
 
 // Listener for authentication state changes
 firebaseAuth.onAuthStateChanged((user) => {
