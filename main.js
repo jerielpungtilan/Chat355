@@ -21,6 +21,8 @@ const firebaseFirestore = getFirestore(firebaseApp);
 const firebaseAuth = getAuth(firebaseApp);
 
 // Get references to HTML elements for user interface interaction
+const emailInput = document.getElementById("emailInput");
+const passwordInput = document.getElementById("passwordInput");
 const loginButton = document.getElementById("loginButton");
 const logoutButton = document.getElementById("logoutButton");
 const signUpButton = document.getElementById("signUpButton");
@@ -108,7 +110,7 @@ firebaseAuth.onAuthStateChanged((user) => {
     } else {
         // User is signed out
         isLoggedIn = false;
-        // Update UI for signed out user
+        // Update UI for signed-out user
     }
 });
 
@@ -159,7 +161,7 @@ logoutButton.addEventListener("click", async () => {
 // Function to retrieve new messages from Firestore in real-time
 function getNewMessages(currentUserEmail) {
     const messageQuery = query(collection(firebaseFirestore, "messages"));
-    const unsubscribe = onSnapshot(messageQuery, (querySnapshot) => {
+    onSnapshot(messageQuery, (querySnapshot) => {
         const newMessages = [];
         querySnapshot.forEach((doc) => {
             newMessages.push({
