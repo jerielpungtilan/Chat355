@@ -1,3 +1,9 @@
+/*  CMSC355, Sect 001
+ *  Group Project - Sprint 1
+ *  Sawiya Aidarus, Dustin Cam, Colin Drake, Jeriel Pungtilan, James West
+ *  JavaScript for setting up Firebase instance, sending/receiving chats, and processsing logins/outs
+ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getFirestore, addDoc, collection, onSnapshot, getDocs, query } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
