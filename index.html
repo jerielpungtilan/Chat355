@@ -1,3 +1,10 @@
+<!--
+  CMSC355, Sect 001
+  Group Project - Sprint 1
+  Sawiya Aidarus, Dustin Cam, Colin Drake, Jeriel Pungtilan, James West
+-->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +16,7 @@
 </head>
 <body>
 <script type="module" src="main.js"></script>
+<!-- Users first see the login/sign up page -->
 <div id="joinView" class="chat-container">
     <h1 class="title">355 Chat</h1>
     <div class="flex-container">
@@ -18,7 +26,7 @@
         <button id="loginButton" class="button">Login</button>
     </div>
 </div>
-
+<!-- Once logged in, the group chat page is presented -->
 <div id="chatsView" class="chat-container hidden">
     <div class="messages">
         <ul id="messageList" class="message-list">
@@ -28,6 +36,5 @@
             <button id="sendButton" class="send-button">Send</button>
             <button id="logoutButton" class="button">Log Out</button>
     </div>
-</div>
 </body>
 </html>
