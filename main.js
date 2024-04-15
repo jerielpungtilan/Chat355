@@ -1,7 +1,7 @@
 /*  CMSC355, Sect 001
- *  Group Project - Sprint 1
+ *  Group Project - Sprint 2
  *  Sawiya Aidarus, Dustin Cam, Colin Drake, Jeriel Pungtilan, James West
- *  JavaScript for setting up Firebase instance, sending/receiving chats, and processsing logins/outs
+ *  JavaScript for setting up Firebase instance, sending/receiving chats, and processing logins/outs
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
@@ -34,7 +34,10 @@ const logoutButton = document.getElementById("logoutButton");
 const signUpButton = document.getElementById("signUpButton");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
+const homeButton = document.getElementById("homeButton");
+const groupChatButton = document.getElementById("groupChatButton");
 const joinView = document.getElementById("joinView");
+const homeView = document.getElementById("homeView");
 const chatsView = document.getElementById("chatsView");
 
 // Initialize variables for managing user state and message data
@@ -61,12 +64,10 @@ signUpButton.addEventListener("click", async () => {
         // Handle successful sign-up by updating UI and loading messages
         console.log("User signed up successfully:", user.uid);
         joinView.classList.add("hidden");
-        chatsView.classList.remove("hidden");
+        homeView.classList.remove("hidden");    //Now shows home page first
         isLoggedIn = true;
-        await loadOldMessages();
-        await getNewMessages(user.email);
-        renderMessages(user.email);
         console.log("User has successfully signed up and logged in.");
+
     } catch (error) {
         console.error("An error occurred during sign-up:", error.message);
         // Handle error (e.g., show error message to the user)
@@ -93,12 +94,10 @@ loginButton.addEventListener("click", async () => {
         // Handle successful login by updating UI and loading messages
         console.log("User logged in successfully:", user.uid);
         joinView.classList.add("hidden");
-        chatsView.classList.remove("hidden");
+        homeView.classList.remove("hidden");    //Now shows home page first
         isLoggedIn = true;
-        await loadOldMessages();
-        await getNewMessages(user.email);
-        renderMessages(user.email); // Pass the current user's email
         console.log("User has successfully logged in.");
+
     } catch (error) {
         // Handle login error
         const errorMessage = error.message;
@@ -106,6 +105,36 @@ loginButton.addEventListener("click", async () => {
     }
 });
 
+// Event listener for group chat button click
+groupChatButton.addEventListener("click", async () => {
+    try{
+        const currentUser = firebaseAuth.currentUser;
+            if (!currentUser) {
+                console.error("No user is currently authenticated.");
+                return;
+            }
+        homeView.classList.add("hidden");
+        chatsView.classList.remove("hidden");
+        await loadOldMessages();
+        await getNewMessages(currentUser.email);
+        renderMessages(currentUser.email);
+        console.log("User has successfully logged in.");
+    } catch (error) {
+        const errorMessage = error.message;
+        console.error("An error occurred while opening the group chat:", errorMessage);
+    }
+});
+
+// Event listener for home page button click
+homeButton.addEventListener("click", async () => {
+    try{
+        chatsView.classList.add("hidden");
+        homeView.classList.remove("hidden");
+    } catch (error){
+        const errorMessage = error.message;
+        console.error("An error occurred while opening the home page:", errorMessage);
+    }
+});
 
 // Listener for authentication state changes
 firebaseAuth.onAuthStateChanged((user) => {
@@ -157,7 +186,8 @@ logoutButton.addEventListener("click", async () => {
         console.log("User logged out successfully");
         // Redirect to the login screen or show/hide elements as needed
         joinView.classList.remove("hidden");
-        chatsView.classList.add("hidden");
+        homeView.classList.add("hidden");       //logoutButton returns from home to login now
+        //chatsView.classList.add("hidden");
     } catch (error) {
         console.error("Error logging out:", error.message);
         // Handle error (e.g., show error message to the user)
