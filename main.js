@@ -52,7 +52,7 @@ signUpButton.addEventListener("click", async () => {
 
     // Check if both email and password are provided
     if (!enteredEmail || !enteredPassword) {
-        alert("Please enter both email and password.");
+        popError("Please enter both email and password.");
         return;
     }
 
@@ -70,6 +70,7 @@ signUpButton.addEventListener("click", async () => {
 
     } catch (error) {
         console.error("An error occurred during sign-up:", error.message);
+        popError("An error occurred during sign-up:" + error.message);
         // Handle error (e.g., show error message to the user)
     }
 });
@@ -82,7 +83,7 @@ loginButton.addEventListener("click", async () => {
 
     // Check if both email and password are provided
     if (!enteredEmail || !enteredPassword) {
-        alert("Please enter both email and password.");
+        popError("Please enter both email and password.");
         return;
     }
 
@@ -100,8 +101,8 @@ loginButton.addEventListener("click", async () => {
 
     } catch (error) {
         // Handle login error
-        const errorMessage = error.message;
-        console.error("An error occurred during login:", errorMessage);
+        console.error("An error occurred during login:", error.message);
+        popError("An error occurred during login:" + error.message);
     }
 });
 
@@ -120,8 +121,8 @@ groupChatButton.addEventListener("click", async () => {
         renderMessages(currentUser.email);
         console.log("User has successfully logged in.");
     } catch (error) {
-        const errorMessage = error.message;
-        console.error("An error occurred while opening the group chat:", errorMessage);
+        console.error("An error occurred while opening the group chat:", error.message);
+        popError("An error occurred while opening the group chat:" + error.message);
     }
 });
 
@@ -131,8 +132,8 @@ homeButton.addEventListener("click", async () => {
         chatsView.classList.add("hidden");
         homeView.classList.remove("hidden");
     } catch (error){
-        const errorMessage = error.message;
-        console.error("An error occurred while opening the home page:", errorMessage);
+        console.error("An error occurred while opening the home page:", error.message);
+        popError("An error occurred while opening the home page:" + error.message);
     }
 });
 
@@ -163,6 +164,7 @@ sendButton.addEventListener("click", async () => {
         const currentUser = firebaseAuth.currentUser;
         if (!currentUser) {
             console.error("No user is currently authenticated.");
+            popError("No user is currently authenticated.");
             return;
         }
 
@@ -175,6 +177,8 @@ sendButton.addEventListener("click", async () => {
         console.log("Message sent successfully:", docRef.id);
     } catch (error) {
         console.error("Error sending message:", error);
+        popError("Error sending message:" + error.message);
+
     }
 });
 
@@ -191,6 +195,7 @@ logoutButton.addEventListener("click", async () => {
     } catch (error) {
         console.error("Error logging out:", error.message);
         // Handle error (e.g., show error message to the user)
+        popError("Error logging out:" + error.message);
     }
 });
 
@@ -232,6 +237,7 @@ async function loadOldMessages() {
         console.log("Historical messages loaded successfully.");
     } catch (error) {
         console.error("Error loading historical messages:", error);
+        popError("Error loading historical messages:" + error.message);
     }
 }
 
@@ -257,3 +263,17 @@ function getMessageHTML(message, currentUserEmail) {
         </div>
     </li>`;
 }
+
+// Function to generate error message HTML when caught
+function popError(message){
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorPopup').style.display = 'block'
+}
+// Function to hide error popups
+function hidePopup(){
+    document.getElementById('errorPopup').style.display = 'none';
+}
+// Listens for page load event, then starts listener for close button click
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('closeButton').addEventListener('click', hidePopup);
+});
