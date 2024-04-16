@@ -1,5 +1,5 @@
 /*  CMSC355, Sect 001
- *  Group Project - Sprint 1
+ *  Group Project - Sprint 2
  *  Sawiya Aidarus, Dustin Cam, Colin Drake, Jeriel Pungtilan, James West
  *  Basic Style Sheet for formatting the index.html page
  *  Contains a handful of basic styles for the various text sizes and page elements
@@ -129,4 +129,21 @@ body {
 .send-icon {
     width: 1.5rem;
     height: 1.5rem;
+}
+/* Layout for error popups */
+.error-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);  /* Always centered */
+  width: 20%;
+  padding: 1.5rem;
+  background-color: lightgray;
+  color: darkslateblue;
+  border: 3px solid darkslateblue;
+  border-radius: 5px;
+  z-index: 1000; /* Makes sure error is on top layer */
+  font-weight: bold;
+  text-align: center;
+  display: none;  /* Default hidden */
 }
