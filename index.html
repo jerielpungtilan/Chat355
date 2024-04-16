@@ -29,8 +29,10 @@
 <!-- Once logged in, the homepage is presented for users to select the chat -->
 <div id="homeView" class="chat-container hidden">
     <h1 class = "title">Welcome to 355 Chat</h1>
-    <button id="groupChatButton" class="button">Group Chat</button> <!-- Group Chat option, DM in sprint 3  -->
-    <button id="logoutButton" class="button">Log Out</button>
+    <div class="flex-container">
+        <button id="groupChatButton" class="button">Group Chat</button> <!-- Group Chat option, DM in sprint 3  -->
+        <button id="logoutButton" class="button">Log Out</button>
+    </div>
 </div>
 <!-- Group chat view is presented when selected, with messages and text input field -->
 <div id="chatsView" class="chat-container hidden">
@@ -38,9 +40,14 @@
         <ul id="messageList" class="message-list">
         </ul>
     </div>
-        <input id="messageInput" type="text" class="input" />
-            <button id="sendButton" class="send-button">Send</button>
-            <button id="homeButton" class="button">Return Home</button> <!-- Return to homeView -->
-    </div>
+    <input id="messageInput" type="text" class="input" />
+    <button id="sendButton" class="send-button">Send</button>
+    <button id="homeButton" class="button">Return Home</button> <!-- Return to homeView -->
+</div>
+<!-- Popup Error Message -->
+<div id="errorPopup" class="error-popup hidden">
+    <p id="errorMessage"></p>
+    <button id="closeButton">Close</button>
+</div>
 </body>
 </html>
