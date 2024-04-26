@@ -116,7 +116,7 @@ groupChatButton.addEventListener("click", async () => {
             }
         homeView.classList.add("hidden");
         chatsView.classList.remove("hidden");
-        await loadOldMessages();
+        await loadOldMessages(currentUser.email);
         await getNewMessages(currentUser.email);
         renderMessages(currentUser.email);
         console.log("User has successfully logged in.");
@@ -224,10 +224,10 @@ function getNewMessages(currentUserEmail) {
 }
 
 // Function to load old messages from Firestore
-async function loadOldMessages() {
+async function loadOldMessages(currentUserEmail) {
     messageList = [];
     try {
-        const messageSnapshot = await getDocs(collection(firebaseFirestore, "messages"));
+        const messageSnapshot = await getDocs(collection(firebaseFirestore, "messages"), orderBy("timestamp"));
         messageSnapshot.forEach((doc) => {
             messageList.push({
                 id: doc.id,
@@ -235,6 +235,7 @@ async function loadOldMessages() {
             });
         });
         console.log("Historical messages loaded successfully.");
+        renderMessages(currentUserEmail);
     } catch (error) {
         console.error("Error loading historical messages:", error);
         popError("Error loading historical messages:" + error.message);
@@ -242,9 +243,18 @@ async function loadOldMessages() {
 }
 
 // Function to render messages in the UI
+// Function to render messages in the UI
 function renderMessages(currentUserEmail) {
     const messageListElement = document.getElementById("messageList");
-    messageListElement.innerHTML = messageList.map(message => getMessageHTML(message, currentUserEmail)).join("");
+
+    // Sort messages by timestamp
+    messageList.sort((a, b) => a.created.seconds - b.created.seconds);
+
+    // Generate HTML for each message
+    const messagesHTML = messageList.map(message => getMessageHTML(message, currentUserEmail)).join("");
+
+    // Set innerHTML of message list element
+    messageListElement.innerHTML = messagesHTML;
 }
 
 // Function to generate HTML for a message
