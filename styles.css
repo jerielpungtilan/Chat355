@@ -1,13 +1,33 @@
 /*  CMSC355, Sect 001
- *  Group Project - Sprint 2
+ *  Group Project - Sprint 3
  *  Sawiya Aidarus, Dustin Cam, Colin Drake, Jeriel Pungtilan, James West
  *  Basic Style Sheet for formatting the index.html page
  *  Contains a handful of basic styles for the various text sizes and page elements
  */
 
+/* Displays the background logo */
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
+    background-image: url('https://i.imgur.com/veW2146.png');
+    background-size: cover; /* Cover the entire area of the viewport */
+    background-position: center;
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed;
 }
+
+/* Semi-transparent overlay */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.5); /* Dark overlay, change rgba values for different colors/opacity */
+    z-index: 0; /* Bottom layer */
+}
+
 
 /* Container for the chat interface */
 .chat-container {
@@ -17,6 +37,8 @@ body {
     padding: 10px;
     border-radius: 0.375rem;
     overflow-y: auto;
+    position: relative;
+    z-index: 1;
 }
 
 /* Hidden items display nothing */
@@ -132,7 +154,7 @@ body {
 }
 /* Layout for error popups */
 .error-popup {
-  position: fixed;
+  position: relative; /* prevents issues with background */
   top: 20%;
   left: 50%;
   transform: translateX(-50%);  /* Always centered */
@@ -142,6 +164,7 @@ body {
   color: darkslateblue;
   border: 3px solid darkslateblue;
   border-radius: 5px;
+  box-shadow: 0 10px 15px rgba(0,0,0,0.75); /* Adds shadow for popup visibility */
   z-index: 1000; /* Makes sure error is on top layer */
   font-weight: bold;
   text-align: center;
